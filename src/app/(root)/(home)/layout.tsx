@@ -1,7 +1,9 @@
+import Navbar from "@/components/custom/global/Navbar";
+
 const HomeLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <main className="relative">
-      Navbar
+      <Navbar />
       <div className="flex">
         Sidebar
 
