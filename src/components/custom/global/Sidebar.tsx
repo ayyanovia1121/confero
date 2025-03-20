@@ -20,7 +20,7 @@ const Sidebar = () => {
               key={link.label}
               className={cn(
                 "flex items-center gap-4 rounded-lg p-4 justify-start",
-                isActive && "bg-blue text-primary-foreground"
+                isActive && "bg-blue-1 text-primary-foreground"
               )}
             >
               <Image
@@ -29,7 +29,9 @@ const Sidebar = () => {
                 width={24}
                 height={24}
               />
-              <p className="text-lg font-semibold max-lg:hidden">{link.label}</p>
+              <p className="text-lg font-semibold max-lg:hidden">
+                {link.label}
+              </p>
             </Link>
           );
         })}
