@@ -2,6 +2,7 @@
 import { useState } from "react";
 import MeetingCard from "./MeetingCard";
 import { useRouter } from "next/navigation";
+import MeetingModal from "./MeetingModal";
 
 type MeetingStatus =
   | "isScheduleMeeting"
@@ -11,6 +12,8 @@ type MeetingStatus =
 const MeetingTypeList = () => {
   const [meetingState, setMeetingState] = useState<MeetingStatus | undefined>();
   const route = useRouter();
+
+
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
       <MeetingCard
@@ -40,6 +43,15 @@ const MeetingTypeList = () => {
         description="Meeting recordings"
         className="bg-yellow-1"
         handleClick={() => route.push("/recordings")}
+      />
+
+      <MeetingModal 
+      isOpen={meetingState === "isInstantMeeting"}
+      onClose={() => setMeetingState(undefined)}
+      title="Start an Instant Meeting"
+      className="text-center"
+      buttonText="Start Meeting"
+      handleClick={() => route.push("/instant-meeting")}
       />
     </section>
   );
