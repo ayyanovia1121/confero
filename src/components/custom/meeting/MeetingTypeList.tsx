@@ -3,6 +3,8 @@ import { useState } from "react";
 import MeetingCard from "./MeetingCard";
 import { useRouter } from "next/navigation";
 import MeetingModal from "./MeetingModal";
+import { useUser } from "@clerk/nextjs";
+import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 
 type MeetingStatus =
   | "isScheduleMeeting"
@@ -13,6 +15,48 @@ const MeetingTypeList = () => {
   const [meetingState, setMeetingState] = useState<MeetingStatus | undefined>();
   const route = useRouter();
 
+  const { user } = useUser();
+  const client = useStreamVideoClient();
+
+  const [values, setValues] = useState({
+    dateTime: new Date(),
+    description: "",
+    link: "",
+  });
+
+  const [callDetails, setCallDetails] = useState<Call>();
+
+  const createMeeting = async () => {
+    if (!user || !client) return null;
+
+    try {
+      const id = crypto.randomUUID();
+      const call = client.call("default", id);
+
+      if (!call) throw new Error("Failed to create call");
+
+      const startAt =
+        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+      const description = values.description || "Instant meeting";
+
+      await call.getOrCreate({
+        data: {
+          starts_at: startAt,
+          custom: {
+            description,
+          },
+        },
+      });
+
+      setCallDetails(call);
+
+      if(!values.description){
+        route.push(`/meeting/${call.id}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -45,13 +89,13 @@ const MeetingTypeList = () => {
         handleClick={() => route.push("/recordings")}
       />
 
-      <MeetingModal 
-      isOpen={meetingState === "isInstantMeeting"}
-      onClose={() => setMeetingState(undefined)}
-      title="Start an Instant Meeting"
-      className="text-center"
-      buttonText="Start Meeting"
-      handleClick={() => route.push("/instant-meeting")}
+      <MeetingModal
+        isOpen={meetingState === "isInstantMeeting"}
+        onClose={() => setMeetingState(undefined)}
+        title="Start an Instant Meeting"
+        className="text-center"
+        buttonText="Start Meeting"
+        handleClick={() => route.push("/instant-meeting")}
       />
     </section>
   );
