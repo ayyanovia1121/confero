@@ -18,6 +18,7 @@ const MeetingTypeList = () => {
 
   const { user } = useUser();
   const client = useStreamVideoClient();
+  const [callDetails, setCallDetails] = useState<Call>();
 
   const [values, setValues] = useState({
     dateTime: new Date(),
@@ -25,13 +26,11 @@ const MeetingTypeList = () => {
     link: "",
   });
 
-  const [callDetails, setCallDetails] = useState<Call>();
-
   const createMeeting = async () => {
     if (!user || !client) return null;
 
     try {
-      if(!values.dateTime){
+      if (!values.dateTime) {
         toast.warning("Please select a date and time");
         return;
       }
@@ -40,13 +39,13 @@ const MeetingTypeList = () => {
 
       if (!call) throw new Error("Failed to create call");
 
-      const startAt =
+      const startsAt =
         values.dateTime.toISOString() || new Date(Date.now()).toISOString();
       const description = values.description || "Instant meeting";
 
       await call.getOrCreate({
         data: {
-          starts_at: startAt,
+          starts_at: startsAt,
           custom: {
             description,
           },
@@ -55,7 +54,7 @@ const MeetingTypeList = () => {
 
       setCallDetails(call);
 
-      if(!values.description){
+      if (!values.description) {
         route.push(`/meeting/${call.id}`);
       }
       toast.success("Meeting created");
@@ -102,7 +101,7 @@ const MeetingTypeList = () => {
         title="Start an Instant Meeting"
         className="text-center"
         buttonText="Start Meeting"
-        handleClick={() => route.push("/instant-meeting")}
+        handleClick={createMeeting}
       />
     </section>
   );
